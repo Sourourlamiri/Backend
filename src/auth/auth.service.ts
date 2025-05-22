@@ -78,12 +78,12 @@ export class AuthService {
           expiresIn:"5m"
         }
       )
-      await this .UtilisateurService.updateToken(utilisateur._id,token)
-      const option={
-        to:utilisateur.Email,
-        Subject:'forgetMotDePasse',
-        context:{token:token},
-        html:`<h1>update your MotDePasse</h1><a href=http://localhost:3000/renitialisermotdepasse/${token}>click here</a>`
+      await this.UtilisateurService.updateToken(utilisateur._id, token);
+      const option = {
+        to: utilisateur.Email,
+        Subject: 'forgetMotDePasse',
+        context: { token: token },
+        html: `<h1>update your MotDePasse</h1><a href=${this.configService.get<string>('FRONTEND_URL')}/renitialisermotdepasse/${token}>click here</a>`
       };
       await this.mailerService.sendMail(option)
       return{

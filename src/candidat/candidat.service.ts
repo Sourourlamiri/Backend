@@ -32,7 +32,8 @@ async createCandidat(CreateCandidatDto:CreateCandidatDto):Promise<ICandidat>{
     to:CreateCandidatDto.Email,
     Subject:'verification de votre adresse email',
     text:`votre code de vérification est : ${code}`,
-    html:`<p> votre code de vérification est :<strong><a href="http://localhost:5002/utilisateur/verify/${code}">${code}</a></strong></p>`,};
+   html: `<p> votre code de vérification est :<strong><a href="${process.env.BACKEND_URL}/utilisateur/verify/${code}">${code}</a></strong></p>`,
+  };
     await this.mailerservice.sendMail(mailoptions);
       const newCandidat=await new this.CandidatModel({...CreateCandidatDto,code:code,MotDePasse:hashedPassword})
       return  await newCandidat.save()

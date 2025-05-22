@@ -11,12 +11,9 @@ import { ConfigModule } from '@nestjs/config';
 import { OffreModule } from './offre/offre.module';
 import { EntretienModule } from './entretien/entretien.module';
 
-
 import { CertificationModule } from './certification/certification.module';
 import { FormationModule } from './formation/formation.module';
 import { ExpérienceModule } from './expérience/expérience.module';
-
-
 
 import { CandidatureModule } from './candidature/candidature.module';
 import { CategorieModule } from './catégorie/catégorie.module';
@@ -27,10 +24,28 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { AvisModule } from './avis/avis.module';
 
 @Module({
-  imports: [MongooseModule.forRoot('mongodb://localhost:27017',{dbName:"recrutement"}),UtilisateurModule, RecruteurModule, CandidatModule,AdministrateurModule, AuthModule,ConfigModule.forRoot({isGlobal:true}), OffreModule, EntretienModule, CategorieModule, CompetenceModule, CertificationModule, FormationModule, ExpérienceModule, CandidatureModule, PaymentModule, ServeStaticModule.forRoot({
-    rootPath: join(__dirname, '..', 'public'),
-  }), AvisModule,
-],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forRoot('mongodb://localhost:27017', { dbName: "recrutement" }),
+    UtilisateurModule,
+    RecruteurModule,
+    CandidatModule,
+    AdministrateurModule,
+    AuthModule,
+    OffreModule,
+    EntretienModule,
+    CategorieModule,
+    CompetenceModule,
+    CertificationModule,
+    FormationModule,
+    ExpérienceModule,
+    CandidatureModule,
+    PaymentModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+    AvisModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
