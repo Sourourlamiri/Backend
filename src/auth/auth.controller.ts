@@ -14,22 +14,20 @@ signIn(@Body() data:CreateAuthDto){
 
 //forget
 @Post('forget')
-forgetMotDePasse(@Body() data:CreateAuthDto){
+forgetMotDePasse(@Body() data:CreateAuthDto){ // Fonction pour envoyer un e-mail de réinitialisation de mot de passe
+  // Cette fonction prend l'e-mail de l'utilisateur et envoie un e-mail avec un lien de réinitialisation
   return this.authService.forgetMotDePasse(data.Email)
 }
 
 
 // rest MotDePasse
-@Post('reset-password/:token')
+@Post('reset-password/:token') // Fonction pour réinitialiser le mot de passe d'un utilisateur
 async resetMotDePasse(@Param('token') token: string, @Body('newPassword') newPassword: string) {
   return this.authService.resetMotDePasse(token, newPassword);
 }
 
-
-
-
 // fuction update 
-@Put('update-password/:id')
+@Put('update-password/:id') // Fonction pour mettre à jour le mot de passe d'un utilisateur
 async updatePassword(
   @Res() response,
   @Param('id') id:string,

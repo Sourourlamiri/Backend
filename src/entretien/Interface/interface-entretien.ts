@@ -7,6 +7,7 @@ export interface IEntretien extends Document{
       
     readonly titre:string
     readonly statut:string
+    readonly type:string
         link:string
 
     Candidat:Types.ObjectId;

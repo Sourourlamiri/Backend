@@ -25,7 +25,8 @@ async updateUser(id:string,UpdateUtilisateurDto):Promise<IUtilisateur>{
 return updateUtilisateurId
 }
 
-async updateToken(id:any,token:string){
+
+async updateToken(id:any,token:string){ // Fonction pour mettre à jour le token de rafraîchissement ki bach y3awed yod5il 
     const utilisateur=await this.UtilisateurModel.findByIdAndUpdate(id,{refreshToken:token},{new:true})
 if(!utilisateur){
     throw new NotFoundException('Utilisateur non trouvé ')
@@ -35,8 +36,8 @@ return utilisateur
 
 
 
-// Fonction pour réinitialiser le mot de passe
-async findutilisateurbyId(id:string){
+
+async findutilisateurbyId(id:string){ // Fonction pour trouver un utilisateur par son ID
     const utilisateur=await this.UtilisateurModel.findById(id)
     if(!utilisateur){
         throw new NotFoundException(`Utilisateur non trouvé`)
@@ -46,8 +47,10 @@ async findutilisateurbyId(id:string){
 
 
 
-//methode vérifier code qund faire la creation de compte
-async verificationcode(code:string,res:any):Promise<any>{
+// Fonction pour vérifier le code de l'utilisateur
+async verificationcode(code:string,res:any):Promise<any>{ 
+  // Si le code existe, on met à jour l'utilisateur pour indiquer qu'il est 
+  //  vérifié  email wa9teli ta3mil inscription yjik code bach yverifie l'email Sinon, on retourne une erreur
     try{
       const existingcode=await this.UtilisateurModel.findOne({code})
       if(!existingcode){

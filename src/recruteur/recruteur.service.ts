@@ -5,28 +5,28 @@ import { InjectModel } from '@nestjs/mongoose';
 import { IRecruteur } from './Interface/Interface-Recruteur';
 import { Model, Types } from 'mongoose';
 import { MailerService } from '@nestjs-modules/mailer';
-import* as crypto from 'crypto';
+import * as crypto from 'crypto';
 import { Subject } from 'rxjs';
 import { text } from 'stream/consumers';
 import * as argon2 from 'argon2';
 
 @Injectable()
 export class RecruteurService {
-  constructor(@InjectModel("utilisateur") private RecruteurModel:Model<IRecruteur>,private mailerservice:MailerService){}
+  constructor(@InjectModel("utilisateur") private RecruteurModel: Model<IRecruteur>, private mailerservice: MailerService) { }
   hashData(data: string) {
     return argon2.hash(data);
   }
 
-  async generatCode():Promise<string>{
+  async generatCode(): Promise<string> {
     return crypto.randomBytes(3).toString('hex').toUpperCase();
   }
 
-// methode create Recruteur
+  // methode create Recruteur
 
-  async createRecruteur(CreateRecruteurDto:CreateRecruteurDto):Promise<IRecruteur>{
-    const hashedPassword=await this.hashData(CreateRecruteurDto.MotDePasse)
+  async createRecruteur(CreateRecruteurDto: CreateRecruteurDto): Promise<IRecruteur> {
+    const hashedPassword = await this.hashData(CreateRecruteurDto.MotDePasse)
 
-  const code =await this .generatCode()
+    const code = await this.generatCode()
     const mailoptions = {
       to: CreateRecruteurDto.Email,
       Subject: 'verification de votre adresse email',
@@ -34,41 +34,50 @@ export class RecruteurService {
       html: `<p> votre code de vérification est :<strong><a href=${process.env.BACKEND_URL}/utilisateur/verify/${code}>${code}</a></strong></p>`,
     };
     await this.mailerservice.sendMail(mailoptions);
-      const newRecruteur=await new this.RecruteurModel({...CreateRecruteurDto,code:code,MotDePasse:hashedPassword})
-      return await newRecruteur.save()
-    }
+    const newRecruteur = await new this.RecruteurModel({ ...CreateRecruteurDto, code: code, MotDePasse: hashedPassword })
+    return await newRecruteur.save()
+  }
 
-  
-  async list():Promise<IRecruteur[]>{
-    const Recruteur=await this.RecruteurModel.find({role:"recruteur"})
+
+  async list(): Promise<IRecruteur[]> {
+    const Recruteur = await this.RecruteurModel.find({ role: "recruteur" })
     return Recruteur
-  
+
   }
-  async deleteRecruteur(id:string):Promise<IRecruteur>{
-    const deleteRecruteur=await this.RecruteurModel.findByIdAndDelete(id)
-    if(!deleteRecruteur){
+  async deleteRecruteur(id: string): Promise<IRecruteur> {
+    const deleteRecruteur = await this.RecruteurModel.findByIdAndDelete(id)
+    if (!deleteRecruteur) {
       throw new NotFoundException(`Recruteur avec ${id} n'été pas trouvé!`)
-  }
+    }
     return deleteRecruteur
-  
+
   }
-  
-  async updateRecruteur(id:string,updaterecruteur:UpdateRecruteurDto):Promise<IRecruteur>{
-    const updateRecruteur=await this.RecruteurModel.findByIdAndUpdate(id,updaterecruteur,{new:true})
-    if(!updateRecruteur){
+
+
+
+
+  async updateRecruteur(id: string, updaterecruteur: UpdateRecruteurDto): Promise<IRecruteur> {
+    const updateRecruteur = await this.RecruteurModel.findByIdAndUpdate(id, updaterecruteur, { new: true })
+    if (!updateRecruteur) {
       throw new NotFoundException(`Recruteur avec ${id} n'été pas modifié!`)
-  }
+
+    }
+    console.log('Recruteur modifié:', updateRecruteur);
     return updateRecruteur
-  
+
   }
-  
-  async getbyId(id:string):Promise<IRecruteur>{
-    const getRecruteur=await this.RecruteurModel.findById(id).populate('Offre').populate('Candidature').populate({path:'entretien',populate:{path:'Candidat'}})
-    if(!getRecruteur){
+
+
+
+
+
+  async getbyId(id: string): Promise<IRecruteur> {
+    const getRecruteur = await this.RecruteurModel.findById(id).populate('Offre').populate('Candidature').populate({ path: 'entretien', populate: { path: 'Candidat' } })
+    if (!getRecruteur) {
       throw new NotFoundException(`Recruteur avec ${id} n'été pas trouvé!`)
-  }
+    }
     return getRecruteur
-  
+
   }
 
 
@@ -78,49 +87,49 @@ export class RecruteurService {
   // Desactiver compte recruteur 
   async desactiver(id: string): Promise<IRecruteur> {
     if (!Types.ObjectId.isValid(id)) {
-        throw new BadRequestException(`ID invalide : ${id}`);
+      throw new BadRequestException(`ID invalide : ${id}`);
     }
 
     const recruteur = await this.RecruteurModel.findOneAndUpdate(
-        { _id: new Types.ObjectId(id), role: "recruteur" },
-        { $set: { activer: "désactivé" } }, // Désactiver le compte
-        { new: true, runValidators: true }
+      { _id: new Types.ObjectId(id), role: "recruteur" },
+      { $set: { activer: "désactivé" } }, // Désactiver le compte
+      { new: true, runValidators: true }
     );
 
     if (!recruteur) {
-        throw new NotFoundException(`Recruteur avec l'ID ${id} introuvable`);
+      throw new NotFoundException(`Recruteur avec l'ID ${id} introuvable`);
     }
 
     console.log(`Recruteur ${id} désactivé avec succès.`);
     return recruteur;
-}
-
-
-// active compte recruteur
-async activer(id: string): Promise<IRecruteur> {
-  if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`ID invalide : ${id}`);
   }
 
-  const recruteur = await this.RecruteurModel.findOneAndUpdate(
+
+  // active compte recruteur
+  async activer(id: string): Promise<IRecruteur> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(`ID invalide : ${id}`);
+    }
+
+    const recruteur = await this.RecruteurModel.findOneAndUpdate(
       { _id: new Types.ObjectId(id), role: "recruteur" },
       { $set: { approved: "activé" } }, // Utilisation de "activé"
       { new: true, runValidators: true }
-  );
+    );
 
-  if (!recruteur) {
+    if (!recruteur) {
       throw new NotFoundException(`Recruteur avec l'ID ${id} introuvable`);
+    }
+
+    console.log(`Recruteur ${id} activé avec succès.`);
+    return recruteur;
   }
 
-  console.log(`Recruteur ${id} activé avec succès.`);
-  return recruteur;
-}
 
 
-
-// Méthode pour compter le nombre total de recruteurs
-async countRecruteurs(): Promise<number> {
-  const count = await this.RecruteurModel.countDocuments({ role: 'recruteur' });
+  // Méthode pour compter le nombre total de recruteurs
+  async countRecruteurs(): Promise<number> {
+    const count = await this.RecruteurModel.countDocuments({ role: 'recruteur' });
     return count;
   }
 
@@ -141,6 +150,5 @@ async countRecruteurs(): Promise<number> {
     return result;
   }
 
-  
-  }
-  
+
+}

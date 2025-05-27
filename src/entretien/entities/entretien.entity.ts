@@ -15,7 +15,8 @@ export class Entretien {
     statut:string
     @Prop()
     link:string
-
+    @Prop()
+    type:string
     
     @Prop({type: mongoose.Schema.Types.ObjectId,ref:'utilisateur'}) 
         Candidat :Types.ObjectId;

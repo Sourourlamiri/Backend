@@ -27,7 +27,7 @@ import { AvisModule } from './avis/avis.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env', }),
     MongooseModule.forRoot(process.env.DATABASE_URL!),
-    //MongooseModule.forRoot('mongodb://localhost:27017', { dbName: "recrutement" }),
+  
     UtilisateurModule,
     RecruteurModule,
     CandidatModule,

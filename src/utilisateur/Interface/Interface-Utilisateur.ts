@@ -3,8 +3,9 @@ export interface IUtilisateur extends Document{
 
    readonly Email:string
    readonly Adresse:string
-   readonly Telephone:number
-
+   readonly Telephone:number 
+   readonly Nom:string
+ 
 
    
    MotDePasse:string

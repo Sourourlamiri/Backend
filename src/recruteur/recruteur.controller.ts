@@ -81,8 +81,14 @@ export class RecruteurController {
       }
     })
   }))
+
+
+
+
+
+
   @Put('/:id')
-  async updateRecruteur(@Res() response, @Param('id') RecruteurId: string, @Body() updateRecruteur: UpdateRecruteurDto, @UploadedFile() file: any) {
+  async updateRecruteur(@Res() response,@Param('id') RecruteurId: string, @Body() updateRecruteur: UpdateRecruteurDto, @UploadedFile() file: any) {
     try {
       // Si une nouvelle image est téléchargée, on l'ajoute à la requête
       updateRecruteur.image = file ? file.filename : null;
@@ -97,6 +103,12 @@ export class RecruteurController {
       });
     }
   }
+
+
+
+
+
+
 
   // Route pour récupérer un recruteur par son ID
   @Get('/:id')

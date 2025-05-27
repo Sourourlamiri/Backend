@@ -35,7 +35,7 @@ async list(@Res() response: Response) {
     const offres = await this.offreService.list();
     const formattedOffres = offres.map(offre => ({
       ...(typeof offre.toObject === 'function' ? offre.toObject() : offre),
-      statut: offre.statut || 'ouvert',  // إضافة statut مع قيمة افتراضية
+      statut: offre.statut || 'ouvert',  
     }));
     return response.status(HttpStatus.OK).json({
       message: `Liste des offres récupérée avec succès !`,

@@ -52,6 +52,7 @@ export class EntretienService {
 
       if(OffreId){
 
+
           // Ajout de l'ID de la entretien à la liste des enretien de la recruteur
         OffreId.entretien.push(saveEnretien._id as mongoose.Types.ObjectId)
         const saveOffre = await OffreId.save()
@@ -77,6 +78,7 @@ export class EntretienService {
         console.log(saveCandidat)
       }
      return saveEnretien 
+
      }
 
  
@@ -95,6 +97,11 @@ export class EntretienService {
       return Entretien
     
     }
+
+
+
+
+
     
     // modifier enretien 
     async updateEntretien(id:string,UpdateEntretien:UpdateEntretienDto):Promise<IEntretien>{
@@ -106,6 +113,8 @@ export class EntretienService {
     
     }
 
+
+
     // get by id 
   async getbyId(id: string): Promise<IEntretien> {
     const getEntretien = await this.EntretienModel.findById(id);
@@ -114,6 +123,19 @@ export class EntretienService {
     }
     return getEntretien;
   }
+
+
+
+
+//Delete entretien
+  // Méthode pour supprimer un entretien par son ID
+async deleteEntretien(id: string): Promise<IEntretien> {
+  const deleteEntretien = await this.EntretienModel.findByIdAndDelete(id).exec();
+  if (!deleteEntretien) {
+    throw new NotFoundException(`Entretien avec ${id} n'a pas été trouvé!`);
+  }
+return deleteEntretien;
+}
 
 
 
@@ -137,6 +159,8 @@ async supprimerEntretien(entretienId: string): Promise<IEntretien> {
   } else {
     throw new NotFoundException(`L'offre avec l'id ${deleteData.Offre} est introuvable`);
   }
+
+
 
   // Mettre à jour le recruteur en supprimant l'entretien de la liste
   const updateRecruteur = await this.recruteurModel.findById(deleteData.Recruteur);

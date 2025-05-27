@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException, UnauthorizedExcepti
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import * as argon2 from 'argon2'
+import * as argon2 from 'argon2' // Pour le hachage des mots de passe
 import { UtilisateurService } from 'src/utilisateur/utilisateur.service';
 import { ConfigService } from '@nestjs/config';
 import { Utilisateur } from 'src/utilisateur/entities/utilisateur.entity';
@@ -14,11 +14,13 @@ export class AuthService {
  constructor ( private jwtService:JwtService, private UtilisateurService:UtilisateurService,private configService:ConfigService,private mailerService:MailerService){}
  
 
-  async signIn(data:CreateAuthDto){
+  async signIn(data:CreateAuthDto){ // Fonction pour connecter un utilisateur
+    // Vérifier si l'utilisateur existe avec l'e-mail fourni
     const utilisateur=await this.UtilisateurService.findUtilisateurByEmail(data.Email)
     if(!utilisateur){
       throw new BadRequestException(`Utilisateur with this ${data.Email} does not existe`) }
-      const verifyMotDePasse=await argon2.verify(utilisateur.MotDePasse,data.MotDePasse)
+      const verifyMotDePasse=await argon2.verify(utilisateur.MotDePasse,data.MotDePasse) // Vérifier le mot de passe fourni avec le mot de passe haché stocké dans la base de données
+      // Si le mot de passe est incorrect, lancer une exception
       if (!verifyMotDePasse){
         throw new BadRequestException('incorrect MotDePasse')
       }
@@ -32,7 +34,8 @@ export class AuthService {
 
 
   // creation de token 
-  async getTokens(UtilisateurId:any,nom:string){
+  async getTokens(UtilisateurId:any,nom:string){ // Fonction pour générer les tokens JWT (access et refresh)
+    // UtilisateurId est l'ID de l'utilisateur, nom est son nom d'utilisateur ou e-mail
     const [accessToken,refreshToken]=await Promise.all([
       this.jwtService.signAsync
       ({sub:UtilisateurId,nom},
@@ -40,7 +43,7 @@ export class AuthService {
     ),
 
     // creation refresh 
-    this.jwtService.signAsync
+    this.jwtService.signAsync // Fonction pour générer le token de rafraîchissement
       ({sub:UtilisateurId,nom},
       {secret:this.configService.get<string>('REFRESH_ACCESS_SECRET'),expiresIn:'7d'}
     )
@@ -52,7 +55,7 @@ export class AuthService {
 
   // fontion  t'hachi bach tzid securité 
   async updateRefreshToken(UtilisateurId:any,refreshtoken:string){
-  const hashedRefreshToken=await argon2.hash(refreshtoken)
+  const hashedRefreshToken=await argon2.hash(refreshtoken) // Hacher le token de rafraîchissement pour le stocker en toute sécurité
 
   // identification update fresh token eli hachinaha 
   await this.UtilisateurService.updateUser(UtilisateurId,{refreshtoken:hashedRefreshToken})
@@ -71,7 +74,7 @@ export class AuthService {
       
 
       // create new token 
-      const token =await this.jwtService.sign(
+      const token =await this.jwtService.sign( // Création d'un token JWT pour la réinitialisation du mot de passe
         {id:utilisateur._id},
         {
           secret:this.configService.get<string>('JWT_ACCESS_SECRET'),
@@ -113,8 +116,10 @@ async resetMotDePasse(token:string, newPassword:string) {
     if (!user) {
       throw new NotFoundException('Utilisateur non trouvé');
     }
+
     // Chiffrer le nouveau mot de passe
-    const hashedPassword = await argon2.hash(newPassword);
+    const hashedPassword = await argon2.hash(newPassword);// Hachage du nouveau mot de passe
+    // Vérifier si le token de réinitialisation correspond à celui stocké dans l'utilisateur
     // Mettre à jour le mot de passe et supprimer le token de réinitialisation
     await this.UtilisateurService.updateUser(user._id as string, {
       MotDePasse: hashedPassword,
@@ -132,7 +137,7 @@ async resetMotDePasse(token:string, newPassword:string) {
 
 
 // function update
-async updatePassword(userId: string, MotDePasse: string, newPassword: string) {
+async updatePassword(userId: string, MotDePasse: string, newPassword: string) { // Fonction pour mettre à jour le mot de passe d'un utilisateur
   try {
     // Récupérer l'utilisateur depuis la base de données
     const user = await this.UtilisateurService.findutilisateurbyId(userId);
@@ -147,7 +152,7 @@ async updatePassword(userId: string, MotDePasse: string, newPassword: string) {
     }
 
     // Chiffrer le nouveau mot de passe
-    const hashedNewPassword = await argon2.hash(newPassword);
+    const hashedNewPassword = await argon2.hash(newPassword);// Hachage du nouveau mot de passe
 
     // Mettre à jour le mot de passe
     await this.UtilisateurService.updateUser(userId, { MotDePasse: hashedNewPassword });

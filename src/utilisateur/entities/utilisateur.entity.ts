@@ -2,7 +2,10 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import* as argon2 from 'argon2'
 @Schema({discriminatorKey:"role"})
 export class Utilisateur{
-    
+    @Prop()
+    Nom:string
+ 
+
     @Prop({unique:true})
     Email:string
     @Prop()

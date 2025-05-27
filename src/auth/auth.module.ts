@@ -15,8 +15,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
       host:'sandbox.smtp.mailtrap.io',
       port: 2525,
       auth:{
-        user:"b0896db78f7521",
-        pass:"1d20741a7d5fb8"
+        user:"cfe3577fa0200b",
+        pass:"0bdb2b638b53ef"
       }
     }
   })

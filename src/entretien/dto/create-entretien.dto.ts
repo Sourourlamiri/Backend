@@ -15,10 +15,13 @@ export class CreateEntretienDto {
     @IsNotEmpty()
     @IsString()
     titre:string
+    @IsNotEmpty()
+    @IsString()
+    type:string
 
     @IsNotEmpty()
   @IsDate()
-  dateFin: Date; // الحقل الجديد الذي يمثل تاريخ ووقت انتهاء المقابلة
+  dateFin: Date; 
     @IsString()
   @IsNotEmpty()
   @Matches(/^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/, {

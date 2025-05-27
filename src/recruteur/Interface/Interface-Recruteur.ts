@@ -11,7 +11,7 @@ export interface IRecruteur extends IUtilisateur {
 
    readonly NomEntreprise: string;
    readonly OffreEmploi: string;
-readonly description: string;
+   readonly description: string;
 
    approved: string;
 

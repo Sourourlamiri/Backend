@@ -37,17 +37,22 @@ export class EntretienController {
   }
 
   @Put('/:id')
-  async updateEntretien(@Res() response, @Param('id') entretienId: string, @Body() updateEntretien: UpdateEntretienDto) {
+  async updateEntretien(@Res() response, @Param('id') entretienId: string, @Body() UpdateEntretienDto: UpdateEntretienDto) {
     try {
-      const updatedEntretien = await this.entretienService.updateEntretien(entretienId, updateEntretien);
+      const updatedEntretien = await this.entretienService.updateEntretien(entretienId, UpdateEntretienDto);
       return response.status(HttpStatus.OK).json({
-        message: `Entretien a été mis à jour!`,
+        message: `Entretien a été mis à jour avec succés!`,
         updatedEntretien
       });
     } catch (error) {
-      throw new BadRequestException(`Entretien n'a pas été mis à jour!`, error.message || 'Un problème est survenu lors de la mise à jour.');
+     return response.status(HttpStatus.NOT_FOUND).json({
+        message: `echec de la mise a jour entretien !`,
+        error: error.message || 'Un problème est survenu lors de la suppression.'
+      });
     }
   }
+
+
 
   @Delete('/:id')
   async deleteEntretien(@Res() response, @Param('id') entretienId: string) {
@@ -58,9 +63,18 @@ export class EntretienController {
         deletedEntretien
       });
     } catch (error) {
-      throw new BadRequestException(`La suppression de l'entretien a échoué!`, error.message || 'Un problème est survenu lors de la suppression.');
+      return response.status(HttpStatus.NOT_FOUND).json({
+        message: `Entretien avec '${entretienId}' n'a pas été trouvé!`,
+        error: error.message || 'Un problème est survenu lors de la suppression.'
+      });
     }
   }
+
+
+
+
+
+
 
   @Get('/:id')
   async getbyId(@Res() response, @Param('id') entretienId: string) {
