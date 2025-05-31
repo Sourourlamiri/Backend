@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Types } from "mongoose";
+
+
 @Schema()
 export class Candidature {
   @Prop()
@@ -8,7 +10,9 @@ export class Candidature {
   @Prop({ default: "en attente", enum: ["acceptée", "rejetée", "en attente"] })
   statut: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Offre' }] })
+
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Offre', onDelete: 'CASCADE'}] })
   Offre: Types.ObjectId[];
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'utilisateur' }] })
   Candidat: Types.ObjectId[];

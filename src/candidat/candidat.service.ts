@@ -87,7 +87,8 @@ async getbyId(id: string): Promise<ICandidat> {
         path: 'Candidature',
         populate: {
           path: 'Offre',
-          model: 'Offre'
+          model: 'Offre',
+          options: { strictPopulate: false }
         }
       },
       { path: 'Formation' },

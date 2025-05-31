@@ -71,6 +71,11 @@ export class CandidatureController {
   }
 
 
+@Get('/by-offre/:offreId') // Endpoint pour récupérer les candidatures par offre
+async getCandidaturesByOffre(@Param('offreId') offreId: string) {
+  const candidatures = await this.candidatureService.list();
+  return candidatures.filter(c => c.Offre && c.Offre.toString() === offreId);
+}
 
   @Put('/:id')
   async updateCandidature(@Res() response, @Param('id') CandidatureId: string, @Body() updateCandidature: UpdateCandidatureDto) {

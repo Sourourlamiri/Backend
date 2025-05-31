@@ -5,4 +5,6 @@ export interface ICandidature extends Document {
   statut: string
   Offre: Types.ObjectId[];
   Candidat: Types.ObjectId[];
+
+
 }
