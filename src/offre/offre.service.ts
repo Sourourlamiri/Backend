@@ -12,6 +12,7 @@ import { ICategorie } from 'src/catégorie/Interface/interface-catégorie';
 
 @Injectable()
 export class OffreService {
+  CandidatureModel: any;
   constructor(
     @InjectModel('Offre') private readonly OffreModel: Model<IOffre>,
     @InjectModel("utilisateur") private recruteurModel: Model<IRecruteur>,
@@ -77,17 +78,41 @@ export class OffreService {
     
       return formattedOffres;
     }
-    
-    
 
-  //  supprimier
-  async deleteOffre(id: string): Promise<IOffre> {
-    const deleteOffre = await this.OffreModel.findByIdAndDelete(id).exec();
-    if (!deleteOffre) {
-      throw new NotFoundException(`Offre avec l'ID ${id} n'a pas été trouvé!`);
-    }
-    return deleteOffre;
+    
+  // Supprimer une offre
+async deleteOffre(id: string): Promise<IOffre> {
+  // 1. D'abord récupérer l'offre pour vérifier les candidatures
+  const offre = await this.OffreModel.findById(id).exec();
+  
+  if (!offre) {
+    throw new NotFoundException(`Offre avec l'ID ${id} n'a pas été trouvé!`);
   }
+
+    // 2. Vérifier s'il y a des candidatures liées à cette offre tayyy
+    if (offre.Candidature && offre.Candidature.length > 0) {
+      throw new BadRequestException(`Impossible de supprimer cette offre car elle a ${offre.Candidature.length} candidature(s) associée(s).`);
+    }
+
+
+  // 3. Si pas de candidatures, procéder à la suppression
+  const deleteOffre = await this.OffreModel.findByIdAndDelete(id).exec();
+  if (!deleteOffre) {
+    throw new NotFoundException(`Offre avec l'ID ${id} n'a pas été trouvé!`);
+  }
+    // 3. Nettoyer la référence de l'offre chez le recruteur
+  if (offre.recruteur) {
+    const recruteur = await this.recruteurModel.findById(offre.recruteur).exec();
+    if (recruteur) {
+      recruteur.Offre = recruteur.Offre.filter(offreId => offreId.toString() !== id);
+      await recruteur.save();
+    }
+  }
+  return deleteOffre;
+}
+
+
+
 
   // modifier
   async updateOffre(id: string, updateOffre: UpdateOffreDto): Promise<IOffre> {
@@ -167,31 +192,40 @@ async activerOffre(id: string): Promise<IOffre> {
   return offre;
 }
 
+// async supprimerOffre(offreId: string): Promise<IOffre> {
+//   // Chercher l'offre
+//   const offre = await this.OffreModel.findById(offreId).exec();
+//   if (!offre) {
+//     throw new NotFoundException(`Offre avec l'ID ${offreId} est introuvable`);
+//   }
+
+//   // Chercher si des candidatures existent pour cette offre
+//   const candidatures = await this.CandidatureModel.find({ offre: offreId }).exec();
+//   if (candidatures.length > 0) {
+//     throw new BadRequestException(`Impossible de supprimer : des candidats ont déjà postulé.`);
+//   }
+
+//   // Supprimer l'offre
+//   await this.OffreModel.findByIdAndDelete(offreId).exec();
+
+//   // Supprimer la référence de l'offre chez le recruteur
+//   const recruteur = await this.recruteurModel.findById(offre.recruteur).exec();
+//   if (recruteur) {
+//     recruteur.Offre = recruteur.Offre.filter(id => id.toString() !== offreId);
+//     await recruteur.save();
+//   }
+
+//   return offre;
+// }
 
 
 
 
-  // Méthode pour supprimer une offre de la base de données, du candidat et du recruteur
-async supprimerOffre(offreId: string): Promise<IOffre> {
-  const deleteData = await this.OffreModel.findByIdAndDelete(offreId).exec();
-  
-  if (!deleteData) {
-      throw new NotFoundException(`Offre avec l'ID ${offreId} est introuvable`);
-  }
-
-  // 🔹 Mise à jour du candidat après la suppression de l'offre
-  const updateRecruteur = await this.recruteurModel.findById(deleteData.recruteur).exec();
-  
-  if (updateRecruteur) {
-    updateRecruteur.Offre = updateRecruteur.Offre.filter(id => id.toString() !== offreId);
-      await updateRecruteur.save();
-  }
-
-  // 🔹 Mise à jour du recruteur après la suppression de l'offre
 
 
-  return deleteData;
-}
+
+
+
 
 async getCandidatsForOffre(offreId: string) {
   // Chercher toutes les candidatures pour cette offre
